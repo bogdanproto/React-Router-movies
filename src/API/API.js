@@ -36,11 +36,11 @@ export async function getMovieReviews(id) {
 
 export async function getMovieByQuery(query) {
   const params = {
-    query: 'aliens',
+    query: query,
     include_adult: false,
     language: 'en-US',
   };
 
   const response = await axios.get(SEARCH, { params });
-  return response.data;
+  return response.data.results;
 }

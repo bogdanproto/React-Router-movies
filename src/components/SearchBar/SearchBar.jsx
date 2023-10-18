@@ -7,26 +7,27 @@ const Searchbar = ({ getQuery }) => {
   const [prevQuery, setPrevQuery] = useState('');
 
   const submitForm = ({ query }) => {
-    if (!query) {
+    const normalaizeQuery = query.toLowerCase();
+    if (!normalaizeQuery) {
       toast.info('Please text your query');
       return;
     }
 
-    if (prevQuery === query) {
+    if (prevQuery === normalaizeQuery) {
       toast.info('This query has done');
       return;
     }
 
-    setPrevQuery(query);
+    setPrevQuery(normalaizeQuery);
 
-    getQuery(query.toLowerCase());
+    getQuery({ query: normalaizeQuery });
   };
 
   return (
     <form onSubmit={handleSubmit(submitForm)}>
-      <button type="submit"></button>
-
       <input {...register('query')} autoFocus placeholder="Search movies" />
+
+      <button type="submit">Search</button>
     </form>
   );
 };

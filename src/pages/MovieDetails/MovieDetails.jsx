@@ -1,19 +1,28 @@
 import { useState } from 'react';
 import { getMovieById } from 'API/API';
-import { Link, Outlet, useParams } from 'react-router-dom';
+import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
+import { useRef } from 'react';
 
 const MovieDetails = () => {
+  const location = useLocation();
+  const refLocation = useRef(location.state?.from);
   const [movieDetails, setMovieDetails] = useState({});
+  const [load, setLoad] = useState(false);
+  const [error, setError] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
     const getDetailsForMivie = async () => {
       try {
+        setLoad(true);
+        setError(false);
         const response = await getMovieById(id);
         setMovieDetails(response);
       } catch (erorr) {
-        console.log(erorr);
+        setError(true);
+      } finally {
+        setLoad(false);
       }
     };
 
@@ -25,6 +34,9 @@ const MovieDetails = () => {
 
   return (
     <>
+      <div>
+        <Link to={refLocation.current}>Go back</Link>
+      </div>
       {poster_path && (
         <img src={`https://image.tmdb.org/t/p/w300/${poster_path}`} alt="" />
       )}

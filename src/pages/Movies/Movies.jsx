@@ -1,19 +1,25 @@
 import { getMovieByQuery } from 'API/API';
+import MoviesList from 'components/MoviesList/MoviesList';
 import Searchbar from 'components/SearchBar/SearchBar';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import { useLocation, useSearchParams } from 'react-router-dom';
 
 const Movies = () => {
-  const [query, setQuery] = useState('');
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [movies, setMovies] = useState([]);
 
   useEffect(() => {
-    if (!query) {
+    const queryParams = searchParams.get('query');
+
+    if (!queryParams) {
       return;
     }
+
     const getMovies = async () => {
       try {
-        const response = await getMovieByQuery(query);
+        const response = await getMovieByQuery(queryParams);
         setMovies(response);
       } catch (error) {
         console.log(error);
@@ -21,12 +27,16 @@ const Movies = () => {
     };
 
     getMovies();
-  }, [query]);
+  }, [searchParams]);
 
-  console.log(movies);
   return (
     <div>
-      <Searchbar getQuery={setQuery} />
+      <Searchbar getQuery={setSearchParams} />
+      {movies.length ? (
+        <MoviesList moviesList={movies} location={location} />
+      ) : (
+        false
+      )}
     </div>
   );
 };
