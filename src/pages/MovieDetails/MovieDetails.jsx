@@ -1,8 +1,18 @@
 import { useState } from 'react';
 import { getMovieById } from 'API/API';
-import { Link, Outlet, useLocation, useParams } from 'react-router-dom';
+import { Outlet, useLocation, useParams } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useRef } from 'react';
+import {
+  AddInfo,
+  AddStyledLink,
+  LinkBack,
+  MovieCard,
+  MovieCardInfo,
+} from './MovieDetails.styled';
+import { useMemo } from 'react';
+import Loader from 'components/Loader/Loader';
+import Error from 'components/Error/Error';
 
 const MovieDetails = () => {
   const location = useLocation();
@@ -29,35 +39,60 @@ const MovieDetails = () => {
     getDetailsForMivie();
   }, [id]);
 
+  const isMovieDetailsEmpty = useMemo(
+    () => Boolean(Object.keys(movieDetails).length),
+    [movieDetails]
+  );
+
   const { poster_path, original_title, vote_average, overview, genres } =
     movieDetails;
 
   return (
     <>
-      <div>
-        <Link to={refLocation.current}>Go back</Link>
-      </div>
-      {poster_path && (
-        <img src={`https://image.tmdb.org/t/p/w300/${poster_path}`} alt="" />
+      <LinkBack to={refLocation.current}>Go back</LinkBack>
+      {load && <Loader />}
+      {error && (
+        <Error
+          textError={'Movie has not founded, choose please another movies'}
+        />
       )}
 
-      <div>
-        <h2>{original_title}</h2>
-        <p>
-          User Score: <span> {vote_average * 10} %</span>
-        </p>
-        <h3>Overview</h3>
-        <p>{overview}</p>
-        <h3>Genres</h3>
-        <ul>
-          {genres?.map(({ id, name }) => (
-            <li key={id}> {name}</li>
-          ))}
-        </ul>
-        <p>Additional information</p>
-        <Link to={`/movies/${id}/cast`}>Cast</Link>
-        <Link to={`/movies/${id}/reviews`}>Reviews</Link>
-      </div>
+      {isMovieDetailsEmpty && (
+        <MovieCard>
+          <div>
+            {poster_path && (
+              <img
+                src={`https://image.tmdb.org/t/p/w300/${poster_path}`}
+                alt=""
+              />
+            )}
+
+            <MovieCardInfo>
+              <h2>{original_title}</h2>
+              <p>
+                User Score: <span> {vote_average?.toFixed(2)} %</span>
+              </p>
+              <h3>Overview</h3>
+              <p>{overview}</p>
+              <h3>Genres</h3>
+              <ul>
+                {genres?.map(({ id, name }) => (
+                  <li key={id}> {name}</li>
+                ))}
+              </ul>
+            </MovieCardInfo>
+          </div>
+          <AddInfo>
+            <p>Additional information</p>
+            <div>
+              <AddStyledLink to={`/movies/${id}/cast`}>Cast</AddStyledLink>
+              <AddStyledLink to={`/movies/${id}/reviews`}>
+                Reviews
+              </AddStyledLink>
+            </div>
+          </AddInfo>
+        </MovieCard>
+      )}
       <div>
         <Outlet />
       </div>

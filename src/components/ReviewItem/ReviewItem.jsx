@@ -1,9 +1,11 @@
+import { ReviewCard } from './ReviewItem.styled';
+
 const ReviewItem = ({ author, content }) => {
   return (
-    <li>
+    <ReviewCard>
       <h3>{author}</h3>
       <p>{content}</p>
-    </li>
+    </ReviewCard>
   );
 };
 
