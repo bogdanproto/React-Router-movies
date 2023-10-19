@@ -1,8 +1,9 @@
-import { useState } from 'react';
-import { getMovieById } from 'API/API';
+import { useState, useRef, useEffect, useMemo, Suspense } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router-dom';
-import { useEffect } from 'react';
-import { useRef } from 'react';
+
+import { getMovieById } from 'API/API';
+import Loader from 'components/Loader/Loader';
+import Error from 'components/Error/Error';
 import {
   AddInfo,
   AddStyledLink,
@@ -10,33 +11,37 @@ import {
   MovieCard,
   MovieCardInfo,
 } from './MovieDetails.styled';
-import { useMemo } from 'react';
-import Loader from 'components/Loader/Loader';
-import Error from 'components/Error/Error';
 
 const MovieDetails = () => {
   const location = useLocation();
-  const refLocation = useRef(location.state?.from);
+  const refLocation = useRef(location.state?.from ?? '/');
   const [movieDetails, setMovieDetails] = useState({});
   const [load, setLoad] = useState(false);
   const [error, setError] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const getDetailsForMivie = async () => {
       try {
         setLoad(true);
         setError(false);
-        const response = await getMovieById(id);
+        const response = await getMovieById(id, controller.signal);
         setMovieDetails(response);
-      } catch (erorr) {
-        setError(true);
-      } finally {
         setLoad(false);
+      } catch (error) {
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     };
 
     getDetailsForMivie();
+
+    return () => {
+      controller.abort();
+    };
   }, [id]);
 
   const isMovieDetailsEmpty = useMemo(
@@ -49,7 +54,9 @@ const MovieDetails = () => {
 
   return (
     <>
-      <LinkBack to={refLocation.current}>Go back</LinkBack>
+      <LinkBack to={refLocation.current}>
+        {refLocation.current ? <p>Go back</p> : <p>Go home</p>}
+      </LinkBack>
       {load && <Loader />}
       {error && (
         <Error
@@ -85,17 +92,16 @@ const MovieDetails = () => {
           <AddInfo>
             <p>Additional information</p>
             <div>
-              <AddStyledLink to={`/movies/${id}/cast`}>Cast</AddStyledLink>
-              <AddStyledLink to={`/movies/${id}/reviews`}>
-                Reviews
-              </AddStyledLink>
+              <AddStyledLink to={`cast`}>Cast</AddStyledLink>
+              <AddStyledLink to={`reviews`}>Reviews</AddStyledLink>
             </div>
           </AddInfo>
         </MovieCard>
       )}
-      <div>
+
+      <Suspense fallback={<Loader />}>
         <Outlet />
-      </div>
+      </Suspense>
     </>
   );
 };

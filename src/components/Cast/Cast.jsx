@@ -8,36 +8,39 @@ import Error from 'components/Error/Error';
 import { CastInfo, GalleryCast } from './Cast.styled';
 
 const Cast = () => {
-  const [castMovies, setCastMovies] = useState([]);
+  const [castMovies, setCastMovies] = useState(null);
   const [load, setLoad] = useState(false);
   const [error, setError] = useState(false);
   const { id } = useParams();
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const getCastForMovie = async () => {
       try {
         setLoad(true);
         setError(false);
-        const response = await getMovieCast(id);
+        const response = await getMovieCast(id, controller.signal);
         setCastMovies(response);
-      } catch (error) {
-        setError(true);
-      } finally {
         setLoad(false);
+      } catch (error) {
+        if (error.code !== 'ERR_CANCELED') {
+          setError(true);
+        }
       }
     };
     getCastForMovie();
+
+    return () => {
+      controller.abort();
+    };
   }, [id]);
 
   return (
     <>
       {load && <Loader />}
-      {error && (
-        <Error
-          textError={'Movie has not founded, choose please another movies'}
-        />
-      )}
-      {Boolean(castMovies.length) && (
+      {error && <Error textError={'Someting went wrong, try to reload'} />}
+      {castMovies && Boolean(castMovies.length) && (
         <GalleryCast>
           {castMovies?.map(({ id, profile_path, name, character }) => (
             <CastItem
@@ -49,7 +52,7 @@ const Cast = () => {
           ))}
         </GalleryCast>
       )}
-      {castMovies.length < 1 && !load && (
+      {castMovies && !castMovies.length && (
         <CastInfo>There are no information about cast</CastInfo>
       )}
     </>

@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-toastify';
 import { useState } from 'react';
+import { FormStyled } from './SearchBar.styled';
 
 const Searchbar = ({ getQuery }) => {
   const { register, handleSubmit } = useForm();
@@ -24,11 +25,11 @@ const Searchbar = ({ getQuery }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit(submitForm)}>
+    <FormStyled onSubmit={handleSubmit(submitForm)}>
       <input {...register('query')} autoFocus placeholder="Search movies" />
 
       <button type="submit">Search</button>
-    </form>
+    </FormStyled>
   );
 };
 

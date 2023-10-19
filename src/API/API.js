@@ -14,33 +14,39 @@ const params = {
   language: 'en-US',
 };
 
-export async function getTrendingMovies() {
-  const response = await axios.get(TRENDING, { params });
+export async function getTrendingMovies(signal) {
+  const response = await axios.get(TRENDING, { params, signal });
   return response.data.results;
 }
 
-export async function getMovieById(id) {
-  const response = await axios.get(DETAILSMOVIE + id, { params });
+export async function getMovieById(id, signal) {
+  const response = await axios.get(DETAILSMOVIE + id, { params, signal });
   return response.data;
 }
 
-export async function getMovieCast(id) {
-  const response = await axios.get(DETAILSMOVIE + id + CREDITS, { params });
+export async function getMovieCast(id, signal) {
+  const response = await axios.get(DETAILSMOVIE + id + CREDITS, {
+    params,
+    signal,
+  });
   return response.data.cast;
 }
 
-export async function getMovieReviews(id) {
-  const response = await axios.get(DETAILSMOVIE + id + REVIEWS, { params });
+export async function getMovieReviews(id, signal) {
+  const response = await axios.get(DETAILSMOVIE + id + REVIEWS, {
+    params,
+    signal,
+  });
   return response.data;
 }
 
-export async function getMovieByQuery(query) {
+export async function getMovieByQuery(query, signal) {
   const params = {
     query: query,
     include_adult: false,
     language: 'en-US',
   };
 
-  const response = await axios.get(SEARCH, { params });
+  const response = await axios.get(SEARCH, { params, signal });
   return response.data.results;
 }

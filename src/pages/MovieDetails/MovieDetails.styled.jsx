@@ -15,20 +15,24 @@ export const LinkBack = styled(NavLink)`
 `;
 
 export const MovieCard = styled.div`
-  div {
-    display: flex;
-    gap: 8px;
-  }
-
   margin-top: 8px;
   padding: 8px;
 
   background-color: lightgray;
   border-radius: 4px;
 
+  div {
+    display: flex;
+    gap: 8px;
+  }
+
   img {
     width: 240px;
     height: auto;
+  }
+
+  p {
+    max-width: 1100px;
   }
 `;
 

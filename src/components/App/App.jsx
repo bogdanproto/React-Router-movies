@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { lazy } from 'react';
 
 import SharedLayout from 'components/SharedLayout/SharedLayout';
+import EmptyPage from 'pages/EmptyPage/EmptyPage';
 
 const Home = lazy(() => import('pages/Home/Home'));
 const Movies = lazy(() => import('pages/Movies/Movies'));
@@ -20,6 +21,7 @@ export const App = () => {
           <Route path="reviews" element={<Reviews />} />
         </Route>
       </Route>
+      <Route path="*" element={<EmptyPage />} />
     </Routes>
   );
 };
